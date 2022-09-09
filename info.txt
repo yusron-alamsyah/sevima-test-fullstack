@@ -1,0 +1,8 @@
+Test Case Web Dev majoo_(Mukhamad Yusron Alamsyah)
+
+gitlab : git clone -b master https://gitlab.com/yusron_alamsyah/test-case-web-developer-majoo.git
+
+url list_produk :http://localhost/yusron_tes/produk/list_produk
+url login : http://localhost/yusron_tes/login/
+user : admin
+pass : admin
