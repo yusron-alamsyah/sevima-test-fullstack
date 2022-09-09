@@ -90,7 +90,7 @@
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
                                         <div class="content">
-                                            <a class="js-acc-btn" href="#">Admin</a>
+                                            <a class="js-acc-btn" href="#"><?=$_SESSION['username']?></a>
                                         </div>
                                         <div class="account-dropdown js-dropdown">
                                             <div class="account-dropdown__footer">
@@ -124,8 +124,8 @@
                                                     src="https://joeschmoe.io/api/v1/random" />
                                             </div>
                                             <div class="col-md-6">
-                                                <h3>Yusron</h3>
-                                                <p>hello.yusron@gmail.com</p>
+                                                <h3><?=$_SESSION['username']?></h3>
+                                                <p><?=$_SESSION['email']?></p>
                                             </div>
                                         </div>
                                     </div>

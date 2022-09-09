@@ -43,6 +43,7 @@ class Login extends MY_Controller {
                     $this->session->set_userdata('log_session', TRUE);
                     $this->session->set_userdata('admin_id', $dataUser->id);
                     $this->session->set_userdata('username', $dataUser->username);
+                    $this->session->set_userdata('email', $dataUser->email);
                     
                     $this->M_login->updateLastLogin($dataUser->id);
                     return successResponse('Login Success',''.base_url().'login/home/');
@@ -51,6 +52,43 @@ class Login extends MY_Controller {
             
         }
 	}
+
+    public function ajax_action_add()
+    {
+
+        $this->form_validation->set_rules('username', 'username', 'required');
+        $this->form_validation->set_rules('password', 'password', 'required');
+        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+
+        if ($this->form_validation->run() == false) {
+            $error = $this->form_validation->error_array();
+
+            return unprocessResponse(displayError($error), $error, '');
+        } else {
+
+           $cek = $this->M_login->fetch_table("id", "m_user", "username = '" . post('username') . "'");
+            if (count($cek) > 0) {
+                return unprocessResponse('Username is already exist');
+            }
+
+            $data = array(
+                "username" => post("username"),
+                "password" => md5(post("password")),
+                "email"     => post("email"),
+            );
+            
+            $add = $this->M_login->insert_table("m_user", $data);   
+            
+            if ($add == false) {
+                return unprocessResponse('Failed to save data');
+            } else {
+                return successResponse('Success Register , Please Login first');
+            }
+
+        }
+
+    }
+
 
     public function home(){
             cekLogin();
