@@ -279,7 +279,7 @@ section {
 
 .page-container {
     background: #e5e5e5;
-    padding-left: 300px;
+    /* padding-left: 300px; */
 }
 
 @media (max-width: 991px) {
@@ -452,7 +452,7 @@ section {
 
 .au-btn:hover {
     color: #fff;
-    background: #3868cd;
+    background: #bd2130;
 }
 
 .au-btn--blue2 {
@@ -1179,8 +1179,8 @@ section {
     position: fixed;
     top: 0;
     right: 0;
-    left: 300px;
-    height: 75px;
+    left: 0;
+    height: 65px;
      z-index: 3; 
 }
 
