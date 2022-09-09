@@ -78,18 +78,17 @@
                     <div class="container-fluid">
                         <div class="header-wrap">
                             <div class="header">
-                            <div class="logo">
-                                <a href="<?=base_url()?>login/home">
-                                    <img src="https://sevima.com/wp-content/themes/sevima2019/img/logo-sevima.png"
-                                        style="width:20%;" alt="Sevima" />
-                                </a>
-                            </div>
+                                <div class="logo">
+                                    <a href="<?=base_url()?>login/home">
+                                        <img src="https://sevima.com/wp-content/themes/sevima2019/img/logo-sevima.png"
+                                            style="width:20%;" alt="Sevima" />
+                                    </a>
+                                </div>
                             </div>
                             <div class="header-button">
+                                <button style="border-radius:10px;" class="btn btn-outline-dark"><i class="fas fa-plus"></i></button>
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
-                                        <div class="image">
-                                        </div>
                                         <div class="content">
                                             <a class="js-acc-btn" href="#">Admin</a>
                                         </div>
@@ -113,22 +112,41 @@
                 <div class="section__content section__content--p30">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-6 offset-md-2">
-                                <div class="au-card">
-                                    <?php  $this->load->view($content); ?>
-                                </div>
+                            <div class="col-md-5 offset-md-2">
+                                <?php  $this->load->view($content); ?>
                             </div>
                             <div class="col-md-3">
                                 <div class="au-card">
-                                    <strong>Suggestion User</strong>
-                                    <table class="table">
-                                        <tr>
-                                            <td></td>
-                                            <td>username</td>
-                                        </tr>
-                                    </table>
+                                    <div class="mb-4">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <img style="border-radius: 50%; width:100%; border:1px solid grey;"
+                                                    src="https://joeschmoe.io/api/v1/random" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h3>Yusron</h3>
+                                                <p>hello.yusron@gmail.com</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <strong>Suggestion User</strong>
+                                        <table class="table mt-3">
+                                            <?php
+                                        for($i=0; $i<=5; $i++){?>
+                                            <tr>
+                                                <td>
+                                                    <img style="border-radius: 50%; border:1px solid grey;"
+                                                        src="https://joeschmoe.io/api/v1/random?<?=$i?>" />
+                                                </td>
+                                                <td>username</td>
+                                            </tr>
+                                            <?php } ?>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-md-2"></div>
                         </div>
 
 
