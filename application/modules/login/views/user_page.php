@@ -86,7 +86,7 @@
                                 </div>
                             </div>
                             <div class="header-button">
-                                <button style="border-radius:10px;" class="btn btn-outline-dark"><i class="fas fa-plus"></i></button>
+                                <button onclick="reset_form()" data-toggle="modal" data-target="#modal_add" style="border-radius:10px;" class="btn btn-outline-dark"><i class="fas fa-plus"></i></button>
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
                                         <div class="content">
@@ -233,6 +233,51 @@ $("#gambar").fileinput({
     'required': true,
     'allowedFileTypes': ['image']
 });
+
+function reset_form(){
+    document.getElementById("form-posting").reset();
+}
+
+function ajax_action_posting() {
+    var form = $('#form-posting')[0];
+    var data = new FormData(form);
+    var caption = editor.getData();
+    data.append('caption',caption)
+    data.append('<?php echo $this->security->get_csrf_token_name(); ?>',"<?php echo $this->security->get_csrf_hash(); ?>");
+
+    $.ajax({
+        url: "<?php echo base_url() ?>login/ajax_action_posting/",
+        type: 'POST',
+        dataType: "json",
+        data:data,
+        enctype: 'multipart/form-data',
+        processData: false,  
+        contentType: false,
+        cache: false,
+        beforeSend: function() {
+            $('#page-load').show();
+        },
+        success: function(data) {
+            $('#page-load').hide();
+            if (data.result) {
+                
+                toastr["success"](data.message.body);
+                $('#modal_add').modal("toggle");
+                // reload_list();
+
+            } else {
+                toastr["error"](data.message.body);
+            }
+
+        },
+        error: function(request, status, error) {
+            $('#page-load').hide();
+            toastr["error"]("Error, Please try again later");
+        }
+    });
+
+    return false;
+}
 </script>
 
 </html>

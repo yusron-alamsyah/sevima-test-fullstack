@@ -93,13 +93,66 @@ class Login extends MY_Controller {
     public function home(){
             cekLogin();
     		$data['content'] = 'dashboard';
-            // $data['active_pelanggan'] = count($this->M_login->fetch_table("id","m_pelanggan",""));
+    		$data['form'] = 'form_posting';
+            $data['list_posting'] = $this->M_login->fetch_table("*","t_posting","");
+            return successResponse($data['list_posting']); die();
                 
             // $data['order_monthly'] = count($this->M_login->fetch_table("id","t_penjualan","MONTH(tanggal) = '".date("m")."' "));
             
             $this->load->view('user_page',$data);
     	
     }
+
+    public function ajax_action_posting()
+    {
+
+        $this->form_validation->set_rules('caption', 'caption', 'required');
+        if (empty($_FILES['gambar']['name']))
+        {
+            $this->form_validation->set_rules('gambar', 'gambar', 'required');
+        }
+        
+        if ($this->form_validation->run() == false) {
+            $error = $this->form_validation->error_array();
+
+            return unprocessResponse(displayError($error), $error, '');
+        } else {
+            
+            $data = array(
+                "caption" => post("caption"),
+                
+            );
+
+            $config['upload_path']          = './uploads/posting';
+            $config['allowed_types']        = 'gif|jpg|png|jpeg';
+            $config['max_size']             = 1024;
+
+            $this->load->library('upload', $config);
+            if ( ! $this->upload->do_upload('gambar'))
+            {
+                $error = array('error' => $this->upload->display_errors());
+                return unprocessResponse($this->upload->display_errors());
+            }
+            else
+            {
+                $fileGambar = array('upload_data' => $this->upload->data());
+                
+                $data['gambar'] = $fileGambar['upload_data']['file_name'];
+                
+            }
+
+            $add = $this->M_login->insert_table("t_posting", $data);   
+            
+            if ($add == false) {
+                return unprocessResponse('Failed to save data');
+            } else {
+                return successResponse('Success Posting', '' . base_url() . 'user/');
+            }
+
+        }
+
+    }
+
 
     public function logout(){
         $session = array("log_session","admin_id","username");
