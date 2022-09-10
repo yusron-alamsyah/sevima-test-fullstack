@@ -228,8 +228,12 @@ $("#gambar").fileinput({
 function reset_form(){
     document.getElementById("form-posting").reset();
 }
-function ajax_action_comment(id){
-    var text = $('.text-komen'+id).val();
+function ajax_action_comment(id,is_detail = false){
+    if(is_detail){
+        var text = $('.text-komen-detail').val();
+    }else{
+        var text = $('.text-komen'+id).val();
+    }
     if(text == ""){
         toastr["error"]("Comment is required");
         return;
@@ -250,9 +254,13 @@ function ajax_action_comment(id){
             success: function(data) {
                 $('#page-load').hide();
                 if (data.result) {
-                    var komen = '<b class="mr-2"><?=$_SESSION["username"]?></b> '+text +"<br>"
-                    $('.tampil-komen'+id).append(komen);
-                    $('.text-komen'+id).val("");
+                    if(is_detail){
+                        ajax_get_detail(id);
+                    }else{
+                        var komen = '<b class="mr-2"><?=$_SESSION["username"]?></b> '+text +"<br>"
+                        $('.tampil-komen'+id).append(komen);
+                        $('.text-komen'+id).val("");    
+                    }
                     toastr["success"]("Success Comment");
                 } else {
                     toastr["error"](data.message.body);
@@ -312,6 +320,8 @@ function ajax_action_posting() {
 }
 
 function ajax_get_detail(id){
+    $('.text-komen-detail').val("");
+    $('#id_detail').val(id);
     $.ajax({
             url: "<?php echo base_url(); ?>login/ajax_get_detail/",
             type: 'GET',
@@ -349,7 +359,7 @@ function ajax_get_detail(id){
                     }
                     
                     $('.detail-komen').append(tr);
-                    $('#modal_detail').modal("toggle");
+                    $('#modal_detail').modal("show");
                 } else {
                     toastr["error"](data.message.body);
                 }
@@ -360,6 +370,11 @@ function ajax_get_detail(id){
                 toastr["error"]("Error, Please try again later");
             }
         });
+}
+
+function ajax_action_comment_detail(){
+    var id = $('#id_detail').val();
+    ajax_action_comment(id,true);
 }
 
 </script>

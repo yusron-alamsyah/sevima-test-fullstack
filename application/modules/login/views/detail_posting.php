@@ -1,10 +1,12 @@
 <div class="modal-dialog modal-xl" style="width: 100%;" role="document">
+    <input id="id_detail" type="hidden" />
     <div class="modal-content">
         <div class="modal-body p-0">
             <div class="row">
                 <div class="col-md-7 p-0" style="background-color: black;">
-                    <div class="height-img" style="height: 100px; display:none;"></div>
+                    <div class="height-img" style="height: 130px; display:none;"></div>
                     <img style="width: 100%;" id="img_detail" src=""alt="">
+                    <div class="height-img" style="height: 130px; display:none;"></div>
                 </div>
                 <div class="col-md-5 p-3">
                     <div class="mb-4">
@@ -20,7 +22,7 @@
                         </div>
                         <hr>
                     </div>
-                    <div style="min-height: 500px;">
+                    <div  style="height: 550px; overflow:auto;">
                         <p style="color:black">
                             <b class="mr-2 show-user-posting"></b>
                             <div class="show-user-caption"></div>
@@ -33,8 +35,8 @@
                     </div>
                     <div style="bottom: 0; position: absolute; width: 90%;">
                         <div class="input-group mb-3">
-                            <input style="border-top:none; border-left:none; border-right:none;" type="text" placeholder="Comment" class="form form-control text-komen<?=$value->id?>" />
-                            <div class="input-group-append" onclick="ajax_action_comment(<?=$value->id?>)">
+                            <input style="border-top:none; border-left:none; border-right:none;" type="text" placeholder="Comment" class="form form-control text-komen-detail" />
+                            <div class="input-group-append" onclick="ajax_action_comment_detail()">
                                 <span class="input-group-text text-primary" style="background-color: white; border:none; cursor:pointer;" >Post</span>
                             </div>
                         </div>           
