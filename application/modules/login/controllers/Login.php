@@ -25,12 +25,9 @@ class Login extends MY_Controller {
     public function session()
 	{        
         header('Content-Type: application/json; charset=utf-8');
-        $akses = array(
-            "like" => true,
-            "posting" => true,
-            "comment" => true,
-        );
-        echo json_encode($_SESSION);
+        
+         print_r($_SESSION["akses"]); die();
+        // echo json_encode(json_decode());
 	}
 
     public function home(){
@@ -93,20 +90,22 @@ class Login extends MY_Controller {
                 if(@$cek==0){
                     return unprocessResponse('Login Failed , Please Check Your Username / Password',null,''.base_url().'login/');
                 }else{
-                    $akses = array(
-                        "like" => false,
-                        "posting" => false,
-                        "comment" => false,
-                    );
+                    $akses = json_decode($dataUser->akses, true);
+                    
                     $this->session->set_userdata('log_session', TRUE);
                     $this->session->set_userdata('admin_id', $dataUser->id);
                     $this->session->set_userdata('username', $dataUser->username);
                     $this->session->set_userdata('email', $dataUser->email);
+                    $this->session->set_userdata('role', $dataUser->role);
                     $this->session->set_userdata('akses', $akses);
                     
                     $this->M_login->updateLastLogin($dataUser->id);
-                    return successResponse('Login Success',''.base_url().'login/home/');
-                                      
+                    if($dataUser->role == "admin"){
+                        return successResponse('Login Success',''.base_url().'user/');
+                    }else{
+                        return successResponse('Login Success',''.base_url().'login/home/');
+                    }
+                                                          
                 }
             
         }
@@ -129,11 +128,18 @@ class Login extends MY_Controller {
             if (count($cek) > 0) {
                 return unprocessResponse('Username is already exist');
             }
+            $akses = array(
+                "like" => true,
+                "posting" => true,
+                "comment" => true,
+            );
 
             $data = array(
                 "username" => post("username"),
                 "password" => md5(post("password")),
                 "email"     => post("email"),
+                "role"     => "user",
+                "akses"    => $akses
             );
             
             $add = $this->M_login->insert_table("m_user", $data);   

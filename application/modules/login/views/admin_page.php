@@ -66,13 +66,6 @@
         } 
         ?>
     </div>
-    <div class="modal fade" id="modal_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <?php 
-        if (isset($form)) {
-            $this->load->view($form_detail); 
-        } 
-        ?>
-    </div>
 
 
     <div class="page-wrapper">
@@ -93,13 +86,12 @@
                                 </div>
                             </div>
                             <div class="header-button">
-                                <?php if(isset($_SESSION["akses"]) && @$_SESSION["akses"]["posting"] == true){ ?>
-                                <button onclick="reset_form()" data-toggle="modal" data-target="#modal_add" style="border-radius:10px;" class="btn btn-outline-dark"><i class="fas fa-plus"></i></button>
-                                <?php } ?>
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
+                                        <div class="image">
+                                        </div>
                                         <div class="content">
-                                            <a class="js-acc-btn" href="#"><?=$_SESSION['username']?></a>
+                                            <a class="js-acc-btn" href="#">Admin</a>
                                         </div>
                                         <div class="account-dropdown js-dropdown">
                                             <div class="account-dropdown__footer">
@@ -121,44 +113,11 @@
                 <div class="section__content section__content--p30">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-5 offset-md-2">
-                                <?php  $this->load->view($content); ?>
-                            </div>
-                            <div class="col-md-3">
+                            <div class="col-md-12">
                                 <div class="au-card">
-                                    <div class="mb-4">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <img style="border-radius: 50%; width:100%; border:1px solid grey;"
-                                                    src="https://joeschmoe.io/api/v1/random" />
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h3><?=$_SESSION['username']?></h3>
-                                                <p><?=$_SESSION['email']?></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <strong>Suggestion User</strong>
-                                        <table class="table mt-3">
-                                            <?php
-                                            foreach ($list_user as $key => $value) { ?>
-                                            <tr>
-                                                <td width="70">
-                                                    <img style="border-radius: 50%; border:1px solid grey;"
-                                                        src="https://joeschmoe.io/api/v1/random?suggest<?=$key?>" />
-                                                </td>
-                                                <td>
-                                                    <div><?=$value->username?></div>
-                                                    <small><?=$value->email?></small>
-                                                </td>
-                                            </tr>
-                                            <?php } ?>
-                                        </table>
-                                    </div>
+                                    <?php  $this->load->view($content); ?>
                                 </div>
                             </div>
-                            <div class="col-md-2"></div>
                         </div>
 
 
@@ -226,156 +185,6 @@ $("#gambar").fileinput({
     'required': true,
     'allowedFileTypes': ['image']
 });
-
-function reset_form(){
-    document.getElementById("form-posting").reset();
-}
-function ajax_action_comment(id,is_detail = false){
-  
-    if(is_detail){
-        var text = $('.text-komen-detail').val();
-    }else{
-        var text = $('.text-komen'+id).val();
-    }
-    
-    $.ajax({
-            url: "<?php echo base_url(); ?>/login/ajax_action_comment/",
-            type: 'POST',
-            dataType: "json",
-            data: {
-                id: id,
-                text: text,
-                '<?php echo $this->security->get_csrf_token_name(); ?>': '<?php echo $this->security->get_csrf_hash(); ?>'
-            },
-            beforeSend: function() {
-                $('#page-load').show();
-            },
-            success: function(data) {
-                $('#page-load').hide();
-                if (data.result) {
-                    if(is_detail){
-                        ajax_get_detail(id);
-                    }else{
-                        var komen = '<b class="mr-2"><?=$_SESSION["username"]?></b> '+text +"<br>"
-                        $('.tampil-komen'+id).append(komen);
-                        $('.text-komen'+id).val("");    
-                    }
-                    toastr["success"]("Success Comment");
-                } else {
-                    toastr["error"](data.message.body);
-                }
-
-            },
-            error: function(request, status, error) {
-                $('#page-load').hide();
-                toastr["error"]("Error, Please try again later");
-            }
-    });
-
-    
-}
-function ajax_action_posting() {
-    var form = $('#form-posting')[0];
-    var data = new FormData(form);
-    var caption = editor.getData();
-    data.append('caption',caption)
-    data.append('<?php echo $this->security->get_csrf_token_name(); ?>',"<?php echo $this->security->get_csrf_hash(); ?>");
-
-    $.ajax({
-        url: "<?php echo base_url() ?>login/ajax_action_posting/",
-        type: 'POST',
-        dataType: "json",
-        data:data,
-        enctype: 'multipart/form-data',
-        processData: false,  
-        contentType: false,
-        cache: false,
-        beforeSend: function() {
-            $('#page-load').show();
-        },
-        success: function(data) {
-            $('#page-load').hide();
-            if (data.result) {
-                
-                toastr["success"](data.message.body);
-                // $('#modal_add').modal("toggle");
-                // reload_list();
-                setTimeout(function() {
-                        window.location = data.redirect
-                }, 500);
-
-            } else {
-                toastr["error"](data.message.body);
-            }
-
-        },
-        error: function(request, status, error) {
-            $('#page-load').hide();
-            toastr["error"]("Error, Please try again later");
-        }
-    });
-
-    return false;
-}
-
-function ajax_get_detail(id){
-    $('.text-komen-detail').val("");
-    $('#id_detail').val(id);
-    $.ajax({
-            url: "<?php echo base_url(); ?>login/ajax_get_detail/",
-            type: 'GET',
-            dataType: "json",
-            data: {
-                id: id
-            },
-            beforeSend: function() {
-                $('#page-load').show();
-                reset_form();
-            },
-            success: function(data) {
-                $('#page-load').hide();
-                if (data.result) {
-                    var list = data.message.body;
-                    if(list.setting.is_height){
-                        $(".height-img").show();
-                    }else{
-                        $(".height-img").hide();
-                    }
-                    document.getElementById("img_detail").src = list.detail.gambar;
-                    $(".show-user-posting").html(list.detail.username);
-                    $(".show-user-email").html(list.detail.email);
-                    $(".show-user-caption").html(list.detail.caption);
-                    
-                    let det = list.list_komentar;
-                    var tr = "";
-                    $('.detail-komen').html("");
-                    det.forEach(showDetailKomen);
-                    function showDetailKomen(item, index) {
-                        tr = tr +"<tr>";
-                        tr = tr + '<td width="70"><img style="border-radius: 50%; border:1px solid grey;" src="https://joeschmoe.io/api/v1/random?komen='+index+'" /></td>';
-                        tr = tr + '<td><b class="mr-2">'+item.username+'</b> <span>'+item.komentar+'</span><br><small>'+item.created_at+'</small></td>';
-                        tr = tr + '</tr>';
-                    }
-                    
-                    $('.detail-komen').append(tr);
-                    $('#modal_detail').modal("show");
-                } else {
-                    toastr["error"](data.message.body);
-                }
-
-            },
-            error: function(request, status, error) {
-                $('#page-load').hide();
-                toastr["error"]("Error, Please try again later");
-            }
-        });
-}
-
-function ajax_action_comment_detail(){
-    var id = $('#id_detail').val();
-    ajax_action_comment(id,true);
-}
-
 </script>
 
 </html>
