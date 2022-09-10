@@ -31,18 +31,32 @@ class Login extends MY_Controller {
                 'table'     => 'm_user',
                 'condition' => 'm_user.id = t_posting.created_by',
                 'jointype'  => '',
+            ),
+            array(
+                'table'     => 't_like',
+                'condition' => 't_like.posting_id = t_posting.id AND t_like.created_by = '.$_SESSION['admin_id'].' ',
+                'jointype'  => 'left',
             )
         );
         
         $data["list_user"] = $this->M_login->fetch_table("*", "m_user","","id","DECS");
 
-        $data['list_posting'] = $this->M_login->fetch_joins("t_posting.*,m_user.username,m_user.email", "t_posting", $joins,);
+        $data['list_posting'] = $this->M_login->fetch_joins("t_posting.*,m_user.username,m_user.email,t_like.posting_id as is_like", "t_posting", $joins,);
         foreach ($data['list_posting'] as $key => $value) {
             $getComments =  $this->M_login->fetch_table("count(komentar) as komentar", "t_komentar","posting_id = '".$value->id."' ");
+            $getLikes =  $this->M_login->fetch_table("count(posting_id) as likes", "t_like","posting_id = '".$value->id."' ");
+            if(!empty($value->is_like)){
+                $value->is_like = true;
+            }else{
+                $value->is_like = false;
+            }
 
              $jumlahKomen = isset($getComments[0]->komentar) ? $getComments[0]->komentar : 0;
+             $jumlahLike = isset($getLikes[0]->likes) ? $getLikes[0]->likes : 0;
+
              $value->tanggal = date("d-m-Y H:i:s",$value->created_at);
              $value->jumlah_komen = $jumlahKomen;
+             $value->jumlah_like = $jumlahLike;
         }
 
         $this->load->view('user_page',$data);
@@ -185,6 +199,38 @@ class Login extends MY_Controller {
 
 
     }
+
+    public function ajax_action_like()
+    {
+
+           $cek = $this->M_login->fetch_table("id", "t_like", "posting_id = '" . post('id') . "' AND t_like.created_by = ".$_SESSION['admin_id']." ");
+            if (count($cek) > 0) {
+                //delete
+                $add = $this->M_login->delete_table("t_like", "posting_id", post("id"));
+                $is_like = false;
+            }else{
+                //insert
+                $data = array(
+                    "posting_id" => post("id")
+                );    
+                $add = $this->M_login->insert_table("t_like", $data);   
+                $is_like = true;
+            }
+            $getLikes =  $this->M_login->fetch_table("count(posting_id) as likes", "t_like","posting_id = '".post("id")."' ");
+            $jumlahLike = isset($getLikes[0]->likes) ? $getLikes[0]->likes : 0;
+
+            
+            if ($add == false) {
+                return unprocessResponse('Failed to save data');
+            } else {
+                return successResponse(["is_like"=>$is_like,"jumlah_like"=>$jumlahLike]);
+            }
+
+        
+
+    }
+
+    
 
     public function logout(){
         $session = array("log_session","admin_id","username");

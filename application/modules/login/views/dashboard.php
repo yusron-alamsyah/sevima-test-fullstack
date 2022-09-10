@@ -19,7 +19,9 @@
     <img
         src="<?=base_url()."/uploads/posting/".$value->gambar?>">
     <div class="p-3">
-    <i class="fas fa-heart mb-3 mr-2" style="font-size:35px"></i> <b>50 Likes</b>
+    <i onclick="ajax_action_like(<?=$value->id?>)" class="fas fa-heart mb-3 mr-2 tampil-like-true<?=$value->id?>" style="font-size:35px; color:red; cursor:pointer;"></i> 
+    <i onclick="ajax_action_like(<?=$value->id?>)" class="fas fa-heart mb-3 mr-2 tampil-like-false<?=$value->id?>" style="font-size:35px; color:#dddddd; cursor:pointer;"></i> 
+    <b> <span class="count-like<?=$value->id?>"><?=$value->jumlah_like?></span> Likes</b>
         <p style="color:black">
             <b class="mr-2"><?=$value->username?></b>
             <?=$value->caption?>
@@ -39,3 +41,49 @@
     </div>
 </div>
 <?php } ?>
+<script>
+    const fruits = <?php echo json_encode($list_posting); ?>;
+    fruits.forEach(listLike);
+    function listLike(item, index) {
+        showLike(item.id,item.is_like);
+    }
+    function showLike(id,is_like){
+        if(is_like == true){
+            $('.tampil-like-true'+id).show();
+            $('.tampil-like-false'+id).hide();
+        }else{
+            $('.tampil-like-false'+id).show();
+            $('.tampil-like-true'+id).hide();
+        }
+    }
+
+    function ajax_action_like(id){
+        $.ajax({
+            url: "<?php echo base_url(); ?>/login/ajax_action_like/",
+            type: 'POST',
+            dataType: "json",
+            data: {
+                id: id,
+                '<?php echo $this->security->get_csrf_token_name(); ?>': '<?php echo $this->security->get_csrf_hash(); ?>'
+            },
+            beforeSend: function() {
+                $('#page-load').show();
+            },
+            success: function(data) {
+                $('#page-load').hide();
+                if (data.result) {
+                    showLike(id,data.message.body.is_like);
+                    $('.count-like'+id).html(data.message.body.jumlah_like);
+                    toastr["success"]("Success Like");
+                } else {
+                    toastr["error"](data.message.body);
+                }
+
+            },
+            error: function(request, status, error) {
+                $('#page-load').hide();
+                toastr["error"]("Error, Please try again later");
+            }
+    });
+    }
+</script>
