@@ -3,7 +3,8 @@
         <div class="modal-body p-0">
             <div class="row">
                 <div class="col-md-7 p-0" style="background-color: black;">
-                    <img id="img_detail" src=""alt="">
+                    <div class="height-img" style="height: 100px; display:none;"></div>
+                    <img style="width: 100%;" id="img_detail" src=""alt="">
                 </div>
                 <div class="col-md-5 p-3">
                     <div class="mb-4">

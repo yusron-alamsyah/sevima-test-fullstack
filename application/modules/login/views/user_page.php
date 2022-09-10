@@ -327,6 +327,11 @@ function ajax_get_detail(id){
                 $('#page-load').hide();
                 if (data.result) {
                     var list = data.message.body;
+                    if(list.setting.is_height){
+                        $(".height-img").show();
+                    }else{
+                        $(".height-img").hide();
+                    }
                     document.getElementById("img_detail").src = list.detail.gambar;
                     $(".show-user-posting").html(list.detail.username);
                     $(".show-user-email").html(list.detail.email);
@@ -342,7 +347,7 @@ function ajax_get_detail(id){
                         tr = tr + '<td><b class="mr-2">'+item.username+'</b> <span>'+item.komentar+'</span><br><small>'+item.created_at+'</small></td>';
                         tr = tr + '</tr>';
                     }
-                    console.log(tr);
+                    
                     $('.detail-komen').append(tr);
                     $('#modal_detail').modal("toggle");
                 } else {

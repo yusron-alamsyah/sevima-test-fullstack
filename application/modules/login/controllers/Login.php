@@ -255,7 +255,9 @@ class Login extends MY_Controller {
         
         $detail_posting = $this->M_login->fetch_joins("t_posting.*,m_user.username,m_user.email", "t_posting", $joins_detail,"t_posting.id = ".$id." ");
 
-
+        foreach ($list_komen as $key => $value) {
+            $value->created_at = date("d-m-Y H:i:s",$value->created_at);
+        }
         
         if ($detail_posting) {
             $detail_posting[0]->gambar = base_url()."/uploads/posting/".$detail_posting[0]->gambar;
