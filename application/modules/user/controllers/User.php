@@ -30,12 +30,8 @@ class User extends MY_Controller
 
     public function ajax_list()
     {
-        $column        = '*';
-        $columnOrder  = array(null, 'username', 'role', 'last_login', null); //set column field database for datatable orderable
-        $columnSearch = array('username', 'role', 'last_login'); //set column field database for datatable searchable
-        $order         = array($this->_primaryKey => 'DESC'); // default order
-
-        $list = $this->M_user->get_datatables($column, $this->_table, $columnOrder, $columnSearch, $order);
+      
+        $list = $this->M_user->listTable();
 
         $data = array();
         $no   = $_POST['start'];
@@ -55,8 +51,8 @@ class User extends MY_Controller
 
         $output = array(
             "draw"            => $_POST['draw'],
-            "recordsTotal"    => $this->M_user->count_all($this->_table),
-            "recordsFiltered" => $this->M_user->count_filtered($column, $this->_table, $columnOrder, $columnSearch, $order),
+            "recordsTotal"    => $this->M_user->countAll(),
+            "recordsFiltered" => $this->M_user->countFilter(),
             "data"            => $data,
         );
         //output to json format
@@ -67,7 +63,7 @@ class User extends MY_Controller
     {
 
         $id  = get("id");
-        $cek = $this->M_user->fetch_table("*", $this->_table, $this->_primaryKey." = '" . get('id') . "'");
+        $cek = $this->M_user->getEdit(get('id'));
         if ($cek) {
             $cek[0]->akses = json_decode($cek[0]->akses);
             return successResponse($cek[0]);
@@ -95,9 +91,9 @@ class User extends MY_Controller
 
             //cek_duplicate
             if (empty($id)) {
-                $cek = $this->M_user->fetch_table("id", $this->_table, "username = '" . post('username') . "'");
+                $cek = $this->M_user->cekDuplicate( post('username') );
             }else{
-                $cek = $this->M_user->fetch_table("id", $this->_table, "username = '" . post('username') . "' and ".$this->_primaryKey." != '".$id."' ");
+                $cek = $this->M_user->cekDuplicateUpdate( post('username') ,$id);
             }
             if (count($cek) > 0) {
                 return unprocessResponse('Duplicate Data ');
@@ -126,9 +122,9 @@ class User extends MY_Controller
             }
             
             if (isset($id) && !empty($id)) {
-                $add = $this->M_user->update_table($this->_table, $data,$this->_primaryKey,$id);   
+                $add = $this->M_user->update($data,$id);   
             }else{
-                $add = $this->M_user->insert_table($this->_table, $data);   
+                $add = $this->M_user->insert($data);   
             }
             if ($add == false) {
                 return unprocessResponse('Failed to save data');
@@ -142,7 +138,7 @@ class User extends MY_Controller
 
     public function ajax_action_delete()
     {
-        $delete = $this->M_user->delete_table($this->_table, $this->_primaryKey, post("id"));
+        $delete = $this->M_user->delete(post("id"));
         if ($delete == false) {
             return unprocessResponse('Failed to delete data');
         } else {

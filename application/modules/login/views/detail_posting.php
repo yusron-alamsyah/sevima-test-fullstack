@@ -22,7 +22,7 @@
                         </div>
                         <hr>
                     </div>
-                    <div  style="height: 550px; overflow:auto;">
+                    <div  style="height: 550px; overflow:auto; margin-bottom:35px;">
                         <p style="color:black">
                             <b class="mr-2 show-user-posting"></b>
                             <div class="show-user-caption"></div>
