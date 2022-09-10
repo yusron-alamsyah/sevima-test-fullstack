@@ -93,7 +93,9 @@
                                 </div>
                             </div>
                             <div class="header-button">
+                                <?php if($_SESSION["akses"]["posting"]){ ?>
                                 <button onclick="reset_form()" data-toggle="modal" data-target="#modal_add" style="border-radius:10px;" class="btn btn-outline-dark"><i class="fas fa-plus"></i></button>
+                                <?php } ?>
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
                                         <div class="content">
@@ -229,16 +231,13 @@ function reset_form(){
     document.getElementById("form-posting").reset();
 }
 function ajax_action_comment(id,is_detail = false){
+  
     if(is_detail){
         var text = $('.text-komen-detail').val();
     }else{
         var text = $('.text-komen'+id).val();
     }
-    if(text == ""){
-        toastr["error"]("Comment is required");
-        return;
-    }
-
+    
     $.ajax({
             url: "<?php echo base_url(); ?>/login/ajax_action_comment/",
             type: 'POST',

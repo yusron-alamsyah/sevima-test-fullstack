@@ -22,6 +22,17 @@ class Login extends MY_Controller {
 		$this->load->view('login_page');
 	}
 
+    public function session()
+	{        
+        header('Content-Type: application/json; charset=utf-8');
+        $akses = array(
+            "like" => true,
+            "posting" => true,
+            "comment" => true,
+        );
+        echo json_encode($_SESSION);
+	}
+
     public function home(){
         cekLogin();
         $data['content'] = 'dashboard';
@@ -82,10 +93,16 @@ class Login extends MY_Controller {
                 if(@$cek==0){
                     return unprocessResponse('Login Failed , Please Check Your Username / Password',null,''.base_url().'login/');
                 }else{
+                    $akses = array(
+                        "like" => false,
+                        "posting" => false,
+                        "comment" => false,
+                    );
                     $this->session->set_userdata('log_session', TRUE);
                     $this->session->set_userdata('admin_id', $dataUser->id);
                     $this->session->set_userdata('username', $dataUser->username);
                     $this->session->set_userdata('email', $dataUser->email);
+                    $this->session->set_userdata('akses', $akses);
                     
                     $this->M_login->updateLastLogin($dataUser->id);
                     return successResponse('Login Success',''.base_url().'login/home/');
@@ -185,6 +202,13 @@ class Login extends MY_Controller {
     public function ajax_action_comment()
     {
 
+        if(!$_SESSION["akses"]["comment"]){
+            return unprocessResponse("You don't have access to Comment");
+        }
+
+        if(empty(post("text"))){
+            return unprocessResponse('Comment is required');
+        }
             $data = array(
                 "posting_id" => post("id"),
                 "komentar"   => post("text"),
@@ -203,6 +227,9 @@ class Login extends MY_Controller {
 
     public function ajax_action_like()
     {
+        if(!$_SESSION["akses"]["like"]){
+            return unprocessResponse("You don't have access to like");
+        }
 
            $cek = $this->M_login->fetch_table("id", "t_like", "posting_id = '" . post('id') . "' AND t_like.created_by = ".$_SESSION['admin_id']." ");
             if (count($cek) > 0) {
