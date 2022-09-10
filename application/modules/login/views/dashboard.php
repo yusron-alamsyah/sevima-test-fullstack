@@ -28,14 +28,14 @@
         </p>
     </div>
     <div class="pl-3 pr-3 pt-1">
-        <div class="mb-2" style="color:lig">Views <?=$value->jumlah_komen?> Comments</div>
+        <div onclick="ajax_get_detail('<?php echo $value->id; ?>')" class="mb-2" style="color:lig">Views <?=$value->jumlah_komen?> Comments</div>
         <div class="tampil-komen<?=$value->id?>">
         </div>
         <div class="input-group mb-3">
-        <input style="border-top:none; border-left:none; border-right:none;" type="text" placeholder="Comment" class="form form-control text-komen<?=$value->id?>" />
-        <div class="input-group-append" onclick="ajax_action_comment(<?=$value->id?>)">
-            <span class="input-group-text text-primary" style="background-color: white; border:none; cursor:pointer;" >Post</span>
-        </div>
+            <input style="border-top:none; border-left:none; border-right:none;" type="text" placeholder="Comment" class="form form-control text-komen<?=$value->id?>" />
+            <div class="input-group-append" onclick="ajax_action_comment(<?=$value->id?>)">
+                <span class="input-group-text text-primary" style="background-color: white; border:none; cursor:pointer;" >Post</span>
+            </div>
         </div>
         
     </div>

@@ -66,6 +66,13 @@
         } 
         ?>
     </div>
+    <div class="modal fade" id="modal_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <?php 
+        if (isset($form)) {
+            $this->load->view($form_detail); 
+        } 
+        ?>
+    </div>
 
 
     <div class="page-wrapper">
@@ -139,7 +146,10 @@
                                                     <img style="border-radius: 50%; border:1px solid grey;"
                                                         src="https://joeschmoe.io/api/v1/random?suggest<?=$key?>" />
                                                 </td>
-                                                <td><?=$value->username?></td>
+                                                <td>
+                                                    <div><?=$value->username?></div>
+                                                    <small><?=$value->email?></small>
+                                                </td>
                                             </tr>
                                             <?php } ?>
                                         </table>
@@ -150,25 +160,6 @@
                         </div>
 
 
-                    </div>
-                </div>
-            </div>
-            <!-- Modal Tambah -->
-            <div class="modal fade" id="modal-tambah" tabindex="-1" role="dialog" aria-labelledby="modalTambah"
-                aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary">
-                            <center>
-                                <h5 style="color: white;" class="modal-title" id="title-tambah">Modal</h5>
-                            </center>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" id="body-tambah">
-
-                        </div>
                     </div>
                 </div>
             </div>
@@ -319,6 +310,53 @@ function ajax_action_posting() {
 
     return false;
 }
+
+function ajax_get_detail(id){
+    $.ajax({
+            url: "<?php echo base_url(); ?>login/ajax_get_detail/",
+            type: 'GET',
+            dataType: "json",
+            data: {
+                id: id
+            },
+            beforeSend: function() {
+                $('#page-load').show();
+                reset_form();
+            },
+            success: function(data) {
+                $('#page-load').hide();
+                if (data.result) {
+                    var list = data.message.body;
+                    document.getElementById("img_detail").src = list.detail.gambar;
+                    $(".show-user-posting").html(list.detail.username);
+                    $(".show-user-email").html(list.detail.email);
+                    $(".show-user-caption").html(list.detail.caption);
+                    
+                    let det = list.list_komentar;
+                    var tr = "";
+                    $('.detail-komen').html("");
+                    det.forEach(showDetailKomen);
+                    function showDetailKomen(item, index) {
+                        tr = tr +"<tr>";
+                        tr = tr + '<td width="70"><img style="border-radius: 50%; border:1px solid grey;" src="https://joeschmoe.io/api/v1/random?komen='+index+'" /></td>';
+                        tr = tr + '<td><b class="mr-2">'+item.username+'</b> <span>'+item.komentar+'</span><br><small>'+item.created_at+'</small></td>';
+                        tr = tr + '</tr>';
+                    }
+                    console.log(tr);
+                    $('.detail-komen').append(tr);
+                    $('#modal_detail').modal("toggle");
+                } else {
+                    toastr["error"](data.message.body);
+                }
+
+            },
+            error: function(request, status, error) {
+                $('#page-load').hide();
+                toastr["error"]("Error, Please try again later");
+            }
+        });
+}
+
 </script>
 
 </html>

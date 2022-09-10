@@ -26,6 +26,7 @@ class Login extends MY_Controller {
         cekLogin();
         $data['content'] = 'dashboard';
         $data['form'] = 'form_posting';
+        $data['form_detail'] = 'detail_posting';
         $joins = array(
             array(
                 'table'     => 'm_user',
@@ -230,6 +231,46 @@ class Login extends MY_Controller {
 
     }
 
+    public function ajax_get_detail()
+    {
+
+        $id  = get("id");
+        $joins = array(
+            array(
+                'table'     => 'm_user',
+                'condition' => 'm_user.id = t_komentar.created_by',
+                'jointype'  => '',
+            )
+        );
+        
+        $list_komen = $this->M_login->fetch_joins("t_komentar.*,m_user.username,m_user.email", "t_komentar", $joins,"posting_id = ".$id." ");
+
+        $joins_detail = array(
+            array(
+                'table'     => 'm_user',
+                'condition' => 'm_user.id = t_posting.created_by',
+                'jointype'  => '',
+            )
+        );
+        
+        $detail_posting = $this->M_login->fetch_joins("t_posting.*,m_user.username,m_user.email", "t_posting", $joins_detail,"t_posting.id = ".$id." ");
+
+
+        
+        if ($detail_posting) {
+            $detail_posting[0]->gambar = base_url()."/uploads/posting/".$detail_posting[0]->gambar;
+
+            list($width, $height, $type, $attr) = getimagesize($detail_posting[0]->gambar);
+            $setting["is_height"] = false;
+            if($height <=700){
+                $setting["is_height"] = true;
+            }
+
+            return successResponse(["detail"=>$detail_posting[0],"list_komentar"=>$list_komen,"setting"=>$setting]);
+        } else {
+            return unprocessResponse('Failed to get data');
+        }
+    }
     
 
     public function logout(){
