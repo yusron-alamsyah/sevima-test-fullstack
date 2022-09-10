@@ -22,6 +22,9 @@ class User extends MY_Controller
     public function index()
     {
         cekLogin();
+        if($_SESSION["role"] != "admin"){
+            redirect("login/home");
+        }
         $data['content'] = $this->_content;
         $data['form']    = $this->_form;
         $this->load->view('login/admin_page.php', $data);

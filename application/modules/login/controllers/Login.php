@@ -35,25 +35,14 @@ class Login extends MY_Controller {
         $data['content'] = 'dashboard';
         $data['form'] = 'form_posting';
         $data['form_detail'] = 'detail_posting';
-        $joins = array(
-            array(
-                'table'     => 'm_user',
-                'condition' => 'm_user.id = t_posting.created_by',
-                'jointype'  => '',
-            ),
-            array(
-                'table'     => 't_like',
-                'condition' => 't_like.posting_id = t_posting.id AND t_like.created_by = '.$_SESSION['admin_id'].' ',
-                'jointype'  => 'left',
-            )
-        );
+       
         
-        $data["list_user"] = $this->M_login->fetch_table("*", "m_user","","id","DECS");
+        $data["list_user"] = $this->M_login->list_user();
 
-        $data['list_posting'] = $this->M_login->fetch_joins("t_posting.*,m_user.username,m_user.email,t_like.posting_id as is_like", "t_posting", $joins,);
+        $data['list_posting'] = $this->M_login->list_posting();
         foreach ($data['list_posting'] as $key => $value) {
-            $getComments =  $this->M_login->fetch_table("count(komentar) as komentar", "t_komentar","posting_id = '".$value->id."' ");
-            $getLikes =  $this->M_login->fetch_table("count(posting_id) as likes", "t_like","posting_id = '".$value->id."' ");
+            $getComments =  $this->M_login->countComment($value->id);
+            $getLikes =  $this->M_login->countLike($value->id);
             if(!empty($value->is_like)){
                 $value->is_like = true;
             }else{
@@ -124,7 +113,7 @@ class Login extends MY_Controller {
             return unprocessResponse(displayError($error), $error, '');
         } else {
 
-           $cek = $this->M_login->fetch_table("id", "m_user", "username = '" . post('username') . "'");
+           $cek = $this->M_login->cekUsername(post('username'));
             if (count($cek) > 0) {
                 return unprocessResponse('Username is already exist');
             }
@@ -139,10 +128,10 @@ class Login extends MY_Controller {
                 "password" => md5(post("password")),
                 "email"     => post("email"),
                 "role"     => "user",
-                "akses"    => $akses
+                "akses"    => json_encode($akses)
             );
             
-            $add = $this->M_login->insert_table("m_user", $data);   
+            $add = $this->M_login->register($data);   
             
             if ($add == false) {
                 return unprocessResponse('Failed to save data');
@@ -192,7 +181,7 @@ class Login extends MY_Controller {
                 
             }
 
-            $add = $this->M_login->insert_table("t_posting", $data);   
+            $add = $this->M_login->add_posting( $data);   
             
             if ($add == false) {
                 return unprocessResponse('Failed to save data');
@@ -220,7 +209,7 @@ class Login extends MY_Controller {
                 "komentar"   => post("text"),
             );
             
-            $add = $this->M_login->insert_table("t_komentar", $data);   
+            $add = $this->M_login->add_comment($data);   
             
             if ($add == false) {
                 return unprocessResponse('Failed to save data');
@@ -237,20 +226,20 @@ class Login extends MY_Controller {
             return unprocessResponse("You don't have access to like");
         }
 
-           $cek = $this->M_login->fetch_table("id", "t_like", "posting_id = '" . post('id') . "' AND t_like.created_by = ".$_SESSION['admin_id']." ");
+           $cek = $this->M_login->cekLike(post('id'));
             if (count($cek) > 0) {
                 //delete
-                $add = $this->M_login->delete_table("t_like", "posting_id", post("id"));
+                $add = $this->M_login->deleteLike(post("id"));
                 $is_like = false;
             }else{
                 //insert
                 $data = array(
                     "posting_id" => post("id")
                 );    
-                $add = $this->M_login->insert_table("t_like", $data);   
+                $add = $this->M_login->add_like($data);   
                 $is_like = true;
             }
-            $getLikes =  $this->M_login->fetch_table("count(posting_id) as likes", "t_like","posting_id = '".post("id")."' ");
+            $getLikes =  $this->M_login->countLike(post("id"));
             $jumlahLike = isset($getLikes[0]->likes) ? $getLikes[0]->likes : 0;
 
             
@@ -268,26 +257,10 @@ class Login extends MY_Controller {
     {
 
         $id  = get("id");
-        $joins = array(
-            array(
-                'table'     => 'm_user',
-                'condition' => 'm_user.id = t_komentar.created_by',
-                'jointype'  => '',
-            )
-        );
         
-        $list_komen = $this->M_login->fetch_joins("t_komentar.*,m_user.username,m_user.email", "t_komentar", $joins,"posting_id = ".$id." ");
-
-        $joins_detail = array(
-            array(
-                'table'     => 'm_user',
-                'condition' => 'm_user.id = t_posting.created_by',
-                'jointype'  => '',
-            )
-        );
+        $list_komen = $this->M_login->list_comment($id);
         
-        $detail_posting = $this->M_login->fetch_joins("t_posting.*,m_user.username,m_user.email", "t_posting", $joins_detail,"t_posting.id = ".$id." ");
-
+        $detail_posting = $this->M_login->detailPosting($id);
         foreach ($list_komen as $key => $value) {
             $value->created_at = date("d-m-Y H:i:s",$value->created_at);
         }
@@ -297,7 +270,7 @@ class Login extends MY_Controller {
 
             list($width, $height, $type, $attr) = getimagesize($detail_posting[0]->gambar);
             $setting["is_height"] = false;
-            if($height <=700){
+            if($height <=500){
                 $setting["is_height"] = true;
             }
 

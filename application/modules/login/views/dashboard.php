@@ -16,8 +16,7 @@
             </table>
         </div>
     </div>
-    <img
-        src="<?=base_url()."/uploads/posting/".$value->gambar?>">
+    <img style="width: 100%; max-height:800px;" src="<?=base_url()."/uploads/posting/".$value->gambar?>">
     <div class="p-3">
     <i onclick="ajax_action_like(<?=$value->id?>)" class="fas fa-heart mb-3 mr-2 tampil-like-true<?=$value->id?>" style="font-size:35px; color:red; cursor:pointer;"></i> 
     <i onclick="ajax_action_like(<?=$value->id?>)" class="fas fa-heart mb-3 mr-2 tampil-like-false<?=$value->id?>" style="font-size:35px; color:#dddddd; cursor:pointer;"></i> 

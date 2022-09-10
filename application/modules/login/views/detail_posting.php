@@ -5,7 +5,7 @@
             <div class="row">
                 <div class="col-md-7 p-0" style="background-color: black;">
                     <div class="height-img" style="height: 130px; display:none;"></div>
-                    <img style="width: 100%;" id="img_detail" src=""alt="">
+                    <img style="width: 100%;max-height:800px;" id="img_detail" src=""alt="">
                     <div class="height-img" style="height: 130px; display:none;"></div>
                 </div>
                 <div class="col-md-5 p-3">
