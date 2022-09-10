@@ -133,13 +133,13 @@
                                         <strong>Suggestion User</strong>
                                         <table class="table mt-3">
                                             <?php
-                                        for($i=0; $i<=5; $i++){?>
+                                            foreach ($list_user as $key => $value) { ?>
                                             <tr>
-                                                <td>
+                                                <td width="70">
                                                     <img style="border-radius: 50%; border:1px solid grey;"
-                                                        src="https://joeschmoe.io/api/v1/random?<?=$i?>" />
+                                                        src="https://joeschmoe.io/api/v1/random?suggest<?=$key?>" />
                                                 </td>
-                                                <td>username</td>
+                                                <td><?=$value->username?></td>
                                             </tr>
                                             <?php } ?>
                                         </table>
@@ -237,7 +237,45 @@ $("#gambar").fileinput({
 function reset_form(){
     document.getElementById("form-posting").reset();
 }
+function ajax_action_comment(id){
+    var text = $('.text-komen'+id).val();
+    if(text == ""){
+        toastr["error"]("Comment is required");
+        return;
+    }
 
+    $.ajax({
+            url: "<?php echo base_url(); ?>/login/ajax_action_comment/",
+            type: 'POST',
+            dataType: "json",
+            data: {
+                id: id,
+                text: text,
+                '<?php echo $this->security->get_csrf_token_name(); ?>': '<?php echo $this->security->get_csrf_hash(); ?>'
+            },
+            beforeSend: function() {
+                $('#page-load').show();
+            },
+            success: function(data) {
+                $('#page-load').hide();
+                if (data.result) {
+                    var komen = '<b class="mr-2"><?=$_SESSION["username"]?></b> '+text +"<br>"
+                    $('.tampil-komen'+id).append(komen);
+                    $('.text-komen'+id).val("");
+                    toastr["success"]("Success Comment");
+                } else {
+                    toastr["error"](data.message.body);
+                }
+
+            },
+            error: function(request, status, error) {
+                $('#page-load').hide();
+                toastr["error"]("Error, Please try again later");
+            }
+    });
+
+    
+}
 function ajax_action_posting() {
     var form = $('#form-posting')[0];
     var data = new FormData(form);
@@ -262,8 +300,11 @@ function ajax_action_posting() {
             if (data.result) {
                 
                 toastr["success"](data.message.body);
-                $('#modal_add').modal("toggle");
+                // $('#modal_add').modal("toggle");
                 // reload_list();
+                setTimeout(function() {
+                        window.location = data.redirect
+                }, 500);
 
             } else {
                 toastr["error"](data.message.body);

@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-lg" style="width: 100%;" role="document">
     <div class="modal-content">
-        <div class="modal-header overview-item--c1">
+        <div class="modal-header bg-danger">
             <center>
                 <h4 style="color: white;" class="modal-title" id="title-tambah">Posting</h4>
             </center>
